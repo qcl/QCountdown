@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Count down</title>
+</head>
+<body>
+<h1>Countdown</h1>
+<div class="count-down">
+    <div class="count-down-timer">
+        
+    </div>
+    <div class="event-name">
+    </div>
+</div>
+<script>
+    // TODO: change event source
+    // TODO: use paremeters as event source
+    fetch('/events.json').then(response => response.json()).then(data => {
+        // TODO valid data
+        // - events array order check, may need to filter or sort it
+        // - event data check
+
+        let now = new Date();
+        for (let event of data.events) {
+            let eventTime = new Date(event.time);
+            if (eventTime > now) {
+                return event;
+                break;
+            }
+        }
+    }).then(event => {
+        // TODO: multiple events, undefined event
+        console.log(event);
+        let diff = Date.parse(event.time) - Date.now();
+        console.log(Math.floor(diff/1000/86400));   // remain how many days
+        // TODO: display it
+    }).catch(err => {
+        // TODO error handling.
+        console.log('jizz');
+    });
+</script>
+</body>
+</html>
+
+
+
