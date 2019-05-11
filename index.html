@@ -3,17 +3,75 @@
 <head>
     <meta charset="UTF-8">
     <title>Count down</title>
+    <style>
+.count-down-time div {
+    display: inline;
+}
+    </style>
 </head>
 <body>
 <h1>Countdown</h1>
 <div class="count-down">
     <div class="count-down-timer">
-        
+        <div class="count-down-time">
+            <div id="days"></div><span id="day-word">天<span>
+            <div id="hours"></div><span id="hour-word">小時</span>
+            <div id="mins"></div><span id="min-word">分鐘</span>
+            <div id="secs"></div><span id="sec-word">秒</span>
+        </div>
     </div>
     <div class="event-name">
     </div>
 </div>
 <script>
+    let timer;
+    let calculateTimeDifference = (startTime, endTime) => {
+        let timeDiff = Math.abs(endTime - startTime);
+        let timeDiffInSec = Math.floor(timeDiff / 1000);
+        let days = Math.floor(timeDiffInSec / 86400);
+        let hours = Math.floor(timeDiffInSec % 86400 / 3600);
+        let mins = Math.floor(timeDiffInSec % 3600 / 60);
+        let secs = timeDiffInSec % 60;
+        let ms = timeDiff % 1000;
+        return {
+            happend: (startTime >= endTime),
+            days,
+            hours,
+            mins,
+            secs,
+            ms,
+        };
+    };
+
+    let updateCountDownUI = (event) => {
+        const timerArea = document.querySelector(".count-down-timer"); 
+        const timeArea = timerArea.querySelector(".count-down-time");
+        const dayDiv = timeArea.querySelector("div#days");
+        const hourDiv = timeArea.querySelector("div#hours");
+        const minDiv = timeArea.querySelector("div#mins");
+        const secDiv = timeArea.querySelector("div#secs");
+        const nameDiv = document.querySelector("div.event-name");
+
+        let timeDiffInfo = calculateTimeDifference(Date.now(), Date.parse(event.time));
+        dayDiv.textContent = timeDiffInfo.days;
+        hourDiv.textContent = timeDiffInfo.hours;
+        minDiv.textContent = timeDiffInfo.mins;
+        secDiv.textContent = timeDiffInfo.secs;
+
+        // TODO: move this outside to prevent always re-assinging same string into it.
+        nameDiv.textContent = event.name;
+    };
+
+    let countDown = (event) => {
+        if (timer) {
+            clearInterval(timer);
+        }
+
+        timer = setInterval(() => {
+            updateCountDownUI(event);
+        }, 1000);
+
+    };
     // TODO: change event source
     // TODO: use paremeters as event source
     fetch('/events.json').then(response => response.json()).then(data => {
@@ -32,9 +90,7 @@
     }).then(event => {
         // TODO: multiple events, undefined event
         console.log(event);
-        let diff = Date.parse(event.time) - Date.now();
-        console.log(Math.floor(diff/1000/86400));   // remain how many days
-        // TODO: display it
+        countDown(event);
     }).catch(err => {
         // TODO error handling.
         console.log('jizz');
